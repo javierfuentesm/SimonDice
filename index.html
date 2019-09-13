@@ -82,6 +82,9 @@
       .hide {
         display: none;
       }
+      * {
+        font-family: Arial, Helvetica, sans-serif;
+      }
     </style>
   </head>
   <body>
@@ -94,36 +97,45 @@
         Empezar a jugar!
       </button>
     </div>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
     <script>
       const celeste = document.getElementById("celeste");
       const violeta = document.getElementById("violeta");
       const naranja = document.getElementById("naranja");
       const verde = document.getElementById("verde");
       const btnEmpezar = document.getElementById("btnEmpezar");
-      const ULTIMO_NIVEL=10
+      const ULTIMO_NIVEL = 10;
 
       class Juego {
         constructor() {
-            
+          this.inicializar = this.inicializar.bind(this);
           this.inicializar();
           this.generarsecuencia();
           setTimeout(() => {
             this.siguientenivel();
           }, 500);
-         
         }
 
         inicializar() {
-        this.elegircolor=this.elegircolor.bind(this)
-        this.siguientenivel= this.siguientenivel.bind(this)
-          btnEmpezar.classList.add("hide");
+          this.elegircolor = this.elegircolor.bind(this);
+          this.siguientenivel = this.siguientenivel.bind(this);
+          this.togglebtnempezar();
           this.nivel = 1;
           this.colores = {
             celeste,
             violeta,
             naranja,
             verde
-          };
+          }
+        }
+        togglebtnempezar() {
+          if (btnEmpezar.classList.contains("hide")) {
+            btnEmpezar.classList.remove("hide");
+          } else {
+            btnEmpezar.classList.add("hide");
+
+          }
         }
         generarsecuencia() {
           this.secuencia = new Array(ULTIMO_NIVEL)
@@ -131,11 +143,10 @@
             .map(n => Math.floor(Math.random() * 4));
         }
         siguientenivel() {
-            this.subnivel=0
+          this.subnivel = 0;
           this.iluminarsecuencia();
-          this.agregareventosclick()
+          this.agregareventosclick();
         }
-
 
         transformarnumeroacolor(numero) {
           switch (numero) {
@@ -151,18 +162,16 @@
         }
         transformarcoloranumero(color) {
           switch (color) {
-            case 'celeste':
+            case "celeste":
               return 0;
             case "violeta":
-              return 1 ;
+              return 1;
             case "naranja":
               return 2;
             case "verde ":
               return 3;
           }
         }
-
-
 
         iluminarsecuencia() {
           for (let i = 0; i < this.nivel; i++) {
@@ -178,47 +187,49 @@
         apagaColor(color) {
           this.colores[color].classList.remove("light");
         }
-        agregareventosclick(){
-            this.colores.celeste.addEventListener('click',this.elegircolor)
-            this.colores.violeta.addEventListener('click',this.elegircolor)
-            this.colores.naranja.addEventListener('click',this.elegircolor)
-            this.colores.verde.addEventListener('click',this.elegircolor)
-
+        agregareventosclick() {
+          this.colores.celeste.addEventListener("click", this.elegircolor);
+          this.colores.violeta.addEventListener("click", this.elegircolor);
+          this.colores.naranja.addEventListener("click", this.elegircolor);
+          this.colores.verde.addEventListener("click", this.elegircolor);
         }
-        eliminareventosclick(){
-            this.colores.celeste.removeEventListener('click',this.elegircolor)
-            this.colores.violeta.removeEventListener('click',this.elegircolor)
-            this.colores.naranja.removeEventListener('click',this.elegircolor)
-            this.colores.verde.removeEventListener('click',this.elegircolor)
+        eliminareventosclick() {
+          this.colores.celeste.removeEventListener("click", this.elegircolor);
+          this.colores.violeta.removeEventListener("click", this.elegircolor);
+          this.colores.naranja.removeEventListener("click", this.elegircolor);
+          this.colores.verde.removeEventListener("click", this.elegircolor);
         }
-        elegircolor(ev){
-            console.log(ev)
+        elegircolor(ev) {
+          console.log(ev);
 
-            const nombrecolor=ev.target.dataset.color
-            const numerocolor= this.transformarcoloranumero(nombrecolor)
-            this.iluminacolor(nombrecolor)
-            if (numerocolor===this.secuencia[this.subnivel]) {
-                this.subnivel++
-                if (this.subnivel===this.nivel) {
-                    this.nivel++
-                    this.eliminareventosclick()
-                    if (this.nivel===(ULTIMO_NIVEL +1)) {
-                        //Gano
-                        
-                    }
-                    else{
-                        setTimeout(this.siguientenivel,1500)
-                    }
-                    
-                }
-                
+          const nombrecolor = ev.target.dataset.color;
+          const numerocolor = this.transformarcoloranumero(nombrecolor);
+          this.iluminacolor(nombrecolor);
+          if (numerocolor === this.secuencia[this.subnivel]) {
+            this.subnivel++;
+            if (this.subnivel === this.nivel) {
+              this.nivel++;
+              this.eliminareventosclick();
+              if (this.nivel === ULTIMO_NIVEL + 1) {
+                this.ganoeljuego();
+              } else {
+                setTimeout(this.siguientenivel, 1500);
+              }
             }
-            else{
-                //perdio
-            }
-
-
-
+          } else {
+            this.perdioeljuego();
+          }
+        }
+        ganoeljuego() {
+          swal('Simon Dice',"Felicitaciones ganaste el juego", "success").then(
+            this.inicializar
+          );
+        }
+        perdioeljuego() {
+          swal('Simon Dice',"Perdiste el juego", "error").then(() => {
+            this.eliminareventosclick();
+            this.inicializar();
+          });
         }
       }
 
